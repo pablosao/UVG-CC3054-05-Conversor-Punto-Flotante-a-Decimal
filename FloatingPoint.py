@@ -94,3 +94,4 @@ def toDecimal(binary=""):
 
 binario =  "1100101110"
 print("Binario: {0}\nDecimal: {1}".format(binario,toDecimal(binary=binario)))
+
