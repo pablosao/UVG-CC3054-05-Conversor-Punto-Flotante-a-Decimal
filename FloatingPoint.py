@@ -61,8 +61,8 @@ def toDecimal(binary=""):
         parser = getSection(section='initial_conf')
         floating_size = int(parser.get("floating_size"))
 
-        if len(binary) < floating_size:
-            print("El valor binario {0} es menor al {1} que fue configurado".format(binary, floating_size))
+        if len(binary) != floating_size:
+            print("El valor binario: {0} tiene un tamaño de {1} bits. Los bits configurados son: {2} bits".format(binary,len(binary), floating_size))
 
         else:
             # tamaño del Exponente
