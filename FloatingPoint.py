@@ -1,8 +1,13 @@
 '''
-@Created: 17/02/2018
+@Edited: 18/02/2018
 @author: Pablo Sao
 @version: 1.5
-@Descripcion: Convierte binarios de punto flotante a decimal y de decimal a punto flotante
+@Descripcion: Se agrega la conversión de decimal a punto flotante
+----------------------------------------------------------------------
+@Created: 17/02/2018
+@author: Pablo Sao
+@version: 1.0
+@Descripcion: Convierte binarios de punto flotante a decimal
 '''
 
 from configparser import ConfigParser
@@ -37,8 +42,8 @@ def getSection(file_name='conf.ini', section=''):
 def getFraction(data=""):
     """
     Sección de la fracción del punto flotante
-    :param data valor binario de la fracción del punro flotante
-    :return: value cálculo del valor decimal de la fracción
+    :param data: valor binario de la fracción del punro flotante
+    :return: value: cálculo del valor decimal de la fracción
     """
     value = 1.00
     data = list(data)
@@ -50,11 +55,11 @@ def getFraction(data=""):
     return value
 
 
-def toDecimal(binary=""):
+def toDecimal(binary):
     """
         conversión del valor binario de punto flotante a su valor decimal
         :param binary valor binario a convertir a binario
-
+        :return decimal retorna el calculo del número decimal dela conversión
         """
 
     decimal = 0
@@ -78,15 +83,15 @@ def toDecimal(binary=""):
 
             # obteniendo formula
             parser = getSection(section='floating_point')
-            formula = str(parser.get("formula").format(str(signo),str(int(exponente,2)),str(fraccion)))
+            formula = str(parser.get("formula_decimal").format(str(signo),str(int(exponente,2)),str(fraccion)))
 
-            '''
+            """
             print("Signo: {0}\nExponente: {1}\nFracción Binaria: {2}\nFracción: {3}\nFormula: {4}".format(signo,
                                                                                                             exponente,
                                                                                                             fraccion_binary,
                                                                                                             fraccion,
                                                                                                             formula))
-            '''
+            """
             decimal = numexpr.evaluate(eval(formula))
             return decimal
 
@@ -95,11 +100,21 @@ def toDecimal(binary=""):
 
 
 def isNegative(number):
+    """
+    Identifica si se debe colocar el bit negativo
+    :param number: bit a evaluar
+    :return: verdadero si es negativo, falso si es positivo
+    """
     if number < 0:
         return True
     return False
 
 def fraccionBinario(number):
+    """
+    Convierte la fracción a binario
+    :param number: decimales de la fracción a convertir
+    :return: String con el valor binario de la fracción
+    """
     valor = 0
     binario = ''
     while number > 0:
@@ -113,13 +128,29 @@ def fraccionBinario(number):
     return binario
 
 def movePoint(value = ""):
+    """
+    Normalización de la fracción
+    :param value: valor del exponente
+    :return: numero de posición que toma el punto al ser normalizado
+    """
+    posicion = value.find(".")
+    desplazamiento = 0
 
-    position = value.find(".")
+    for control in range(posicion):
+        if(value[control] == "1"):
+            desplazamiento = desplazamiento + 1
 
-    return 2
+    if(desplazamiento>0):
+        desplazamiento = posicion - (desplazamiento + 1)
+
+    return desplazamiento
 
 def toFloatingPoint(number):
-
+    """
+    Conversor de un valor decimal a un binario de punto flotante
+    :param number: numero decimal a convertir
+    :return: string con el binario de punto flotante
+    """
     #declaración variables
     signo = "0"
     exponente = ""
@@ -158,13 +189,21 @@ def toFloatingPoint(number):
     if(len(fraccion) < fraccion_size):
         fraccion = fraccion + ("0"*(fraccion_size - len(fraccion)))
 
-    binary = binary+"."+fraccion
-    print("signo " + signo)
-    print("exponente " + binary)
+    binario = binary+"."+fraccion
 
-#print(str(bin(15))[1:5])
+    exponente = movePoint(binario)
+
+    tempBin = str(bin(exponente + 127))
+
+    res = signo + str(tempBin)[2:len(tempBin)] + (binary + fraccion)[(len(binary) - exponente):len(binary + fraccion)]
+
+    return res[0:floating_size]
+
+
+
 binario =  "0100000101110000"
-print("Binario: {0}\nDecimal: {1}".format(binario,toDecimal(binary=binario)))
+print("Punto Flotante a Decimal\n\tBinario: {0}\n\tDecimal: {1}".format(binario,toDecimal(binario)))
 
-toFloatingPoint(15)
+decimal = 15
+print("\nDecimal a Punto Flotante\n\tDecimal: {0}\n\tBinario: {1}".format(decimal,toFloatingPoint(decimal)))
 
